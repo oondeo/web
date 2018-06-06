@@ -1,11 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <templates id="template" xml:space="preserve">
-<t t-name="WebExportTreeViewXls">
-    <div class="o_cp_sidebar btn-group btn-group-sm">
-        <button class="btn btn-default export_treeview_xls" type="button" title="Export xls">
-            <i t-translation="off" class="fa fa-file-excel-o"></i>
-        </button>
-    </div>
-</t>
+<t t-extend="ListView.buttons">                   
+    <t t-jquery="button.o_list_button_add" t-operation="after">
+        <div class="btn-group o_dropdown">
+            <button class="o_dropdown_toggler_btn btn btn-sm dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
+                Exportar <span class="caret"></span>
+            </button>
+            <ul class="dropdown-menu" role="menu">
+                <li class="oe_sidebar_export_view_xls"><span>Excel</span></li>
+                <li class="oe_sidebar_export_view_csv"><span>CSV</span></li>
+                <li class="oe_sidebar_export_view_xls_default"><span>Custom</span></li>
+            </ul>
+        </div>
+    </t>       
+</t>  
 </templates>

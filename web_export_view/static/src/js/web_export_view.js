@@ -2,27 +2,48 @@ odoo.define('web_export_view', function (require) {
 "use strict";
 
     var core = require('web.core');
-    var Sidebar = require('web.Sidebar');
+    var ListView = require('web.ListView');
     var QWeb = core.qweb;
+    var DataExport = require('web.DataExport');
+
 
     var _t = core._t;
 
-    Sidebar.include({
+    ListView.include({
 
-        redraw: function () {
+        render_buttons: function() {
+
             var self = this;
-            this._super.apply(this, arguments);
-            if (self.getParent().ViewManager.active_view.type == 'list') {
-                self.$el.find('.o_dropdown').last().append(QWeb.render('WebExportTreeViewXls', {widget: self}));
-                self.$el.find('.export_treeview_xls').on('click', self.on_sidebar_export_treeview_xls);
-            }
-        },
+            this._super.apply(this,arguments);        
 
-        on_sidebar_export_treeview_xls: function () {
+
+            if (this.$buttons) {
+                this.$buttons.find('.oe_sidebar_export_view_xls').unbind("click").click(this.proxy('on_sidebar_export_view_xls'));
+                this.$buttons.find('.oe_sidebar_export_view_csv').unbind("click").click(this.proxy('on_sidebar_export_view_csv'));
+                this.$buttons.find('.oe_sidebar_export_view_xls_default').unbind("click").click(this.proxy('on_sidebar_export_view_xls_default')) ;
+                //on_sidebar_export_view_xls_default
+            }
+        },     
+        on_sidebar_export_view_xls_default: function() {
+	    new DataExport(this,this.dataset).open();
+            return false;
+        },       
+        on_sidebar_export_view_csv: function (){
+            this.export_view("csv");
+            return false;
+        }, 
+
+        on_sidebar_export_view_xls: function (){
+            this.export_view("xls");
+            return false;
+        }, 
+
+        export_view: function (fmt) {
             // Select the first list of the current (form) view
             // or assume the main view is a list view and use that
             var self = this,
                 view = this.getParent(),
+                domain = view.dataset.domain,
                 children = view.getChildren();
             if (children) {
                 children.every(function (child) {
@@ -39,7 +60,7 @@ odoo.define('web_export_view', function (require) {
             }
             var export_columns_keys = [];
             var export_columns_names = [];
-            $.each(view.visible_columns, function () {
+            $.each(this.visible_columns, function () {
                 if (this.tag == 'field' && (this.widget === undefined || this.widget != 'handle')) {
                     // non-fields like `_group` or buttons
                     export_columns_keys.push(this.id);
@@ -86,10 +107,12 @@ odoo.define('web_export_view', function (require) {
                 });
             }
             view.session.get_file({
-                url: '/web/export/xls_view',
+                url: '/web/export/'+fmt+'_view',
                 data: {data: JSON.stringify({
-                    model: view.model,
+                    model: this.model,
                     headers: export_columns_names,
+                    header_keys: export_columns_keys,
+                    domain: domain,
                     rows: export_rows
                 })},
                 complete: $.unblockUI

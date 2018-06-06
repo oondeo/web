@@ -8,14 +8,14 @@
 
 {
     'name': 'Web Export Current View',
-    'version': '10.0.1.0.0',
+    'version': '10.0.2.0.0',
     'category': 'Web',
     'author': 'Henry Zhou, Agile Business Group, \
             Odoo Community Association (OCA)',
     'website': 'http://www.agilebg.com',
     'license': 'AGPL-3',
     'depends': [
-        'web',
+        'web','base_import'
     ],
     "data": [
         'views/web_export_view_view.xml',
